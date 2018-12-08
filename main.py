@@ -213,7 +213,7 @@ class PeoplePage(webapp2.RequestHandler):
         uni_matches = User.query(User.university == current_user.university,
                             User.email != current_user.email).fetch()
         interest_matches = []
-        no_interest_matches = []
+        low_matches = []
 
         # here's where I sort the uni matches
         for other_user in uni_matches:
@@ -227,15 +227,13 @@ class PeoplePage(webapp2.RequestHandler):
             if(similarity_index >= 3):
                 interest_matches.insert(0, other_user_dict)
             elif similarity_index == 2:
-                interest_matches.insert(int(len(interest_matches)/2), other_user_dict)
-            elif similarity_index == 1:
                 interest_matches.append(other_user_dict)
+            elif similarity_index == 1:
+                low_matches.insert(0, other_user_dict)
             elif similarity_index == 0:
-                no_interest_matches.append(other_user_dict)
+                low_matches.append(other_user_dict)
 
-        # If the array is too short, add the rest of the uni matches
-        if len(interest_matches) < 20:
-            interest_matches.extend(no_interest_matches)
+        interest_matches.extend(low_matches)
 
         # now it's time to trim it so there's a max 20 recommended users
         # cut it off - because the best ones will be in the front!
